@@ -130,27 +130,6 @@ const ploBlinds: BlindLevel[] = [
   { level: 15, smallBlind: 3000, bigBlind: 6000, ante: 6000, duration: 30 },
 ];
 
-const mainEventBlinds: BlindLevel[] = [
-  { level: 1, smallBlind: 100, bigBlind: 200, ante: 200, duration: 40 },
-  { level: 2, smallBlind: 200, bigBlind: 300, ante: 300, duration: 40 },
-  { level: 3, smallBlind: 200, bigBlind: 400, ante: 400, duration: 40 },
-  { level: 4, smallBlind: 300, bigBlind: 500, ante: 500, duration: 40 },
-  { level: 5, smallBlind: 300, bigBlind: 600, ante: 600, duration: 40 },
-  { level: 6, smallBlind: 0, bigBlind: 0, ante: 0, duration: 15, isBreak: true },
-  { level: 7, smallBlind: 400, bigBlind: 800, ante: 800, duration: 40 },
-  { level: 8, smallBlind: 500, bigBlind: 1000, ante: 1000, duration: 40 },
-  { level: 9, smallBlind: 600, bigBlind: 1200, ante: 1200, duration: 40 },
-  { level: 10, smallBlind: 800, bigBlind: 1500, ante: 1500, duration: 40 },
-  { level: 11, smallBlind: 0, bigBlind: 0, ante: 0, duration: 15, isBreak: true },
-  { level: 12, smallBlind: 1000, bigBlind: 2000, ante: 2000, duration: 40 },
-  { level: 13, smallBlind: 1500, bigBlind: 2500, ante: 2500, duration: 40 },
-  { level: 14, smallBlind: 1500, bigBlind: 3000, ante: 3000, duration: 40 },
-  { level: 15, smallBlind: 2000, bigBlind: 4000, ante: 4000, duration: 40 },
-  { level: 16, smallBlind: 0, bigBlind: 0, ante: 0, duration: 15, isBreak: true },
-  { level: 17, smallBlind: 3000, bigBlind: 5000, ante: 5000, duration: 40 },
-  { level: 18, smallBlind: 3000, bigBlind: 6000, ante: 6000, duration: 40 },
-];
-
 const deepstackBlinds: BlindLevel[] = [
   { level: 1, smallBlind: 100, bigBlind: 100, ante: 100, duration: 30 },
   { level: 2, smallBlind: 100, bigBlind: 200, ante: 200, duration: 30 },
@@ -225,28 +204,6 @@ const ploPrizepool: Prizepool = {
     { place: "10th", amount: 986, percentage: 2.2 },
     { place: "11th-12th", amount: 762, percentage: 1.7 },
     { place: "13th-15th", amount: 583, percentage: 1.3 },
-  ],
-};
-
-const mainEventPrizepool: Prizepool = {
-  guaranteed: 150000,
-  totalEntries: 156,
-  totalPool: 171600,
-  placesPaid: 20,
-  breakdown: [
-    { place: "1st", amount: 46332, percentage: 27.0 },
-    { place: "2nd", amount: 30888, percentage: 18.0 },
-    { place: "3rd", amount: 22308, percentage: 13.0 },
-    { place: "4th", amount: 15444, percentage: 9.0 },
-    { place: "5th", amount: 11869, percentage: 6.92 },
-    { place: "6th", amount: 9438, percentage: 5.5 },
-    { place: "7th", amount: 7550, percentage: 4.4 },
-    { place: "8th", amount: 6006, percentage: 3.5 },
-    { place: "9th", amount: 4805, percentage: 2.8 },
-    { place: "10th", amount: 3775, percentage: 2.2 },
-    { place: "11th-12th", amount: 2917, percentage: 1.7 },
-    { place: "13th-15th", amount: 2231, percentage: 1.3 },
-    { place: "16th-20th", amount: 1716, percentage: 1.0 },
   ],
 };
 
@@ -428,7 +385,6 @@ function buildInitialState(): TournamentState {
 
   // Use deterministic "random" — reset seed via fixed ordering
   const ploNames = PLAYER_NAMES.slice(0, 58);
-  const mainNames = [...PLAYER_NAMES.slice(20), ...PLAYER_NAMES.slice(0, 20)].slice(0, 60);
 
   // PLO: 8 tables, 8-handed, ~58 players → some tables have 7
   const ploTables = createTables(
@@ -438,16 +394,6 @@ function buildInitialState(): TournamentState {
     ploNames,
     [8000, 45000],
     { 3: [7], 6: [4, 8], 7: [2], 8: [5, 6] } // some empty seats
-  );
-
-  // Main Event: 8 tables, 8-handed, ~60 players → some tables have 7
-  const mainTables = createTables(
-    "main",
-    8,
-    8,
-    mainNames,
-    [15000, 80000],
-    { 2: [3], 5: [6], 7: [1, 8], 8: [4] } // some empty seats
   );
 
   // Championship Final Table: 1 table, 9-handed, 7 players (deep stacks)
@@ -516,22 +462,6 @@ function buildInitialState(): TournamentState {
       handsPerTable: 8,
       startingChips: 20000,
       gameType: "Pot-Limit Omaha",
-    },
-    {
-      id: "main",
-      name: "$1,100 Main Event",
-      buyIn: 1100,
-      status: "live",
-      tables: mainTables,
-      blindStructure: mainEventBlinds,
-      prizepool: mainEventPrizepool,
-      lateRegEndLevel: 9,
-      currentLevel: 3,
-      clockRunning: true,
-      clockTimeRemaining: 1823, // 30:23
-      handsPerTable: 8,
-      startingChips: 40000,
-      gameType: "No-Limit Hold'em",
     },
     {
       id: "championship",
@@ -643,24 +573,6 @@ function buildInitialState(): TournamentState {
       timestamp: Date.now() - 600000,
       read: true,
       tournamentId: "plo",
-    },
-    {
-      id: "notif-4",
-      type: "level",
-      title: "Level Change",
-      message: "Level 3 starting — Blinds 200/400/400",
-      timestamp: Date.now() - 180000,
-      read: false,
-      tournamentId: "main",
-    },
-    {
-      id: "notif-5",
-      type: "redraw",
-      title: "Table Rebalance Needed",
-      message: "Table 7 has 6 players. Move Owen Jenkins (Table 7, Seat 4) → Table 2, Seat 3",
-      timestamp: Date.now() - 400000,
-      read: false,
-      tournamentId: "main",
     },
     // Championship final table notifications
     {

@@ -89,7 +89,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       {/* Logo / Title */}
       <div className="px-4 py-5 border-b border-border">
         <h1 className="text-base font-semibold tracking-tight">Jupiter</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">Tournament Management</p>
+        <p className="text-xs text-muted-foreground mt-0.5">Tournament Management Demo</p>
         <p className="text-[11px] text-muted-foreground/50 mt-1">
           Built by{" "}
           <a
@@ -151,6 +151,17 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <p className="text-[11px] leading-relaxed text-amber-200/80">
             Interested in a fully custom solution for your poker room or tournament series?{" "}
             <span className="text-amber-300 font-semibold">Get in touch &rarr;</span>
+          </p>
+        </a>
+        <a
+          href="https://apps.apple.com/us/developer/juniper-studios/id1729037646"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block rounded-lg border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 px-3 py-3 hover:from-blue-500/20 hover:to-cyan-500/20 transition-all"
+        >
+          <p className="text-[11px] leading-relaxed text-blue-200/80">
+            View the player-side demo app{" "}
+            <span className="text-blue-300 font-semibold">&rarr;</span>
           </p>
         </a>
         <Separator />
