@@ -158,9 +158,9 @@ export function generateReport(tournament: Tournament, reportType: ReportType): 
       if (currentBlind && !currentBlind.isBreak) {
         addLine(
           "Blinds",
-          `${formatCurrency(currentBlind.smallBlind)} / ${formatCurrency(currentBlind.bigBlind)}`
+          `${formatChips(currentBlind.smallBlind)} / ${formatChips(currentBlind.bigBlind)}`
         );
-        if (currentBlind.ante > 0) addLine("Ante", formatCurrency(currentBlind.ante));
+        if (currentBlind.ante > 0) addLine("Ante", formatChips(currentBlind.ante));
         addLine("Level Duration", `${currentBlind.duration} min`);
       }
 
@@ -196,9 +196,9 @@ export function generateReport(tournament: Tournament, reportType: ReportType): 
           addTableRow(
             [
               level.level.toString(),
-              formatCurrency(level.smallBlind),
-              formatCurrency(level.bigBlind),
-              level.ante > 0 ? formatCurrency(level.ante) : "—",
+              formatChips(level.smallBlind),
+              formatChips(level.bigBlind),
+              level.ante > 0 ? formatChips(level.ante) : "—",
               `${level.duration} min`,
             ],
             [40, 80, 80, 60, 60]
