@@ -51,6 +51,13 @@ export interface RedrawAssignment {
   toSeat: number;
 }
 
+export interface PaidOutPlayer {
+  place: number;
+  placeLabel: string;
+  playerName: string;
+  amount: number;
+}
+
 export interface Tournament {
   id: string;
   name: string;
@@ -67,6 +74,7 @@ export interface Tournament {
   startingChips: number;
   gameType: string;
   pendingRedraw?: RedrawAssignment[];
+  paidOutPlayers?: PaidOutPlayer[];
 }
 
 export type NotificationType = "redraw" | "level" | "registration" | "action" | "alert";

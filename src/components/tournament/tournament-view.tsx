@@ -10,6 +10,7 @@ import { AddPlayerModal } from "@/components/admin/add-player-modal";
 import { RedrawPanel } from "@/components/admin/redraw-panel";
 import { TournamentSettings } from "@/components/settings/tournament-settings";
 import { NotificationPanel } from "@/components/notifications/notification-panel";
+import { ReportsPanel } from "@/components/admin/reports-panel";
 import { motion, useAnimation } from "framer-motion";
 
 export function TournamentView() {
@@ -93,6 +94,7 @@ export function TournamentView() {
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0 ml-2">
+          <ReportsPanel />
           <NotificationPanel />
           <TournamentSettings />
         </div>

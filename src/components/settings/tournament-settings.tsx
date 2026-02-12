@@ -11,7 +11,7 @@ import { Settings, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function TournamentSettings() {
-  const { selectedTournament } = useTournament();
+  const { selectedTournament, getPlayerCount } = useTournament();
   const [blindsExpanded, setBlindsExpanded] = useState(false);
   const [prizepoolExpanded, setPrizepoolExpanded] = useState(false);
 
@@ -19,6 +19,13 @@ export function TournamentSettings() {
 
   const currentBlind = selectedTournament.blindStructure[selectedTournament.currentLevel - 1];
   const lateRegOpen = selectedTournament.currentLevel <= selectedTournament.lateRegEndLevel;
+  const playerCount = getPlayerCount(selectedTournament);
+  const inTheMoney =
+    selectedTournament.status === "live" &&
+    playerCount <= selectedTournament.prizepool.placesPaid &&
+    selectedTournament.prizepool.placesPaid > 0;
+  const paidOutPlayers = selectedTournament.paidOutPlayers ?? [];
+  const showPayoutsAwarded = inTheMoney && paidOutPlayers.length > 0;
 
   return (
     <Sheet>
@@ -84,6 +91,36 @@ export function TournamentSettings() {
             </section>
 
             <Separator />
+
+            {/* Payouts Awarded (in-the-money only) */}
+            {showPayoutsAwarded && (
+              <>
+                <section>
+                  <h4 className="text-sm font-medium mb-3">Payouts Awarded</h4>
+                  <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 overflow-hidden">
+                    <div className="divide-y divide-border/50 max-h-[240px] overflow-y-auto">
+                      {paidOutPlayers.map((p) => (
+                        <div
+                          key={`${p.place}-${p.playerName}`}
+                          className="flex items-center justify-between gap-4 px-4 py-2.5"
+                        >
+                          <span className="text-sm font-medium text-muted-foreground w-12 shrink-0">
+                            {p.placeLabel}
+                          </span>
+                          <span className="text-sm font-medium truncate flex-1 min-w-0">
+                            {p.playerName}
+                          </span>
+                          <span className="text-sm font-semibold text-emerald-400 shrink-0">
+                            ${p.amount.toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+                <Separator />
+              </>
+            )}
 
             {/* Prizepool */}
             <section>

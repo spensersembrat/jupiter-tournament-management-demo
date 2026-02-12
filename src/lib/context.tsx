@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from "react";
-import { Tournament, TournamentState, Notification, Player, NotificationType } from "./types";
+import { Tournament, TournamentState, Notification, Player, NotificationType, Prizepool, PaidOutPlayer } from "./types";
 import { INITIAL_STATE, generatePlayerId } from "./data";
 
 // ── Actions ─────────────────────────────────────────────────────────
@@ -38,6 +38,23 @@ function createNotification(
     read: false,
     tournamentId,
   };
+}
+
+function getPayoutForPlace(place: number, prizepool: Prizepool): { amount: number; placeLabel: string } | null {
+  const suffixes: Record<number, string> = { 1: "st", 2: "nd", 3: "rd" };
+  const suffix = suffixes[place] ?? "th";
+  const placeLabel = `${place}${suffix}`;
+
+  for (const entry of prizepool.breakdown) {
+    const rangeMatch = entry.place.match(/(\d+)\w*(?:\s*-\s*(\d+)\w*)?/);
+    if (!rangeMatch) continue;
+    const low = parseInt(rangeMatch[1], 10);
+    const high = rangeMatch[2] ? parseInt(rangeMatch[2], 10) : low;
+    if (place >= low && place <= high) {
+      return { amount: entry.amount, placeLabel };
+    }
+  }
+  return null;
 }
 
 function getPlayerCount(tournament: Tournament): number {
@@ -118,19 +135,42 @@ function reducer(state: TournamentState, action: Action): TournamentState {
 
       const tournaments = state.tournaments.map((t) => {
         if (t.id !== action.tournamentId) return t;
+
+        const playerCountBefore = getPlayerCount(t);
+        const updatedTables = t.tables.map((table) => ({
+          ...table,
+          seats: table.seats.map((seat) => {
+            if (seat.player?.id === action.playerId) {
+              bustedPlayer = seat.player;
+              bustedTableNumber = table.number;
+              return { ...seat, player: null };
+            }
+            return seat;
+          }),
+        }));
+
+        const inTheMoney =
+          playerCountBefore <= t.prizepool.placesPaid && t.prizepool.placesPaid > 0;
+        const payoutInfo = inTheMoney
+          ? getPayoutForPlace(playerCountBefore, t.prizepool)
+          : null;
+
+        const newPaidOut: PaidOutPlayer | null =
+          bustedPlayer && payoutInfo
+            ? {
+                place: playerCountBefore,
+                placeLabel: payoutInfo.placeLabel,
+                playerName: bustedPlayer.name,
+                amount: payoutInfo.amount,
+              }
+            : null;
+
         return {
           ...t,
-          tables: t.tables.map((table) => ({
-            ...table,
-            seats: table.seats.map((seat) => {
-              if (seat.player?.id === action.playerId) {
-                bustedPlayer = seat.player;
-                bustedTableNumber = table.number;
-                return { ...seat, player: null };
-              }
-              return seat;
-            }),
-          })),
+          tables: updatedTables,
+          paidOutPlayers: newPaidOut
+            ? [...(t.paidOutPlayers ?? []), newPaidOut].sort((a, b) => a.place - b.place)
+            : t.paidOutPlayers,
         };
       });
 
@@ -147,7 +187,6 @@ function reducer(state: TournamentState, action: Action): TournamentState {
           )
         );
 
-        // Check if rebalance is needed
         if (updatedTournament) {
           const rebalanceNotifs = checkRebalanceNeeded(updatedTournament);
           newNotifications = [...newNotifications, ...rebalanceNotifs];
