@@ -123,9 +123,6 @@ export function BustPlayerModal() {
               <p className="text-sm text-muted-foreground">
                 Table {confirmPlayer.tableNumber}, Seat {confirmPlayer.player.seatNumber}
               </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Stack: {confirmPlayer.player.chipCount.toLocaleString()}
-              </p>
             </div>
             <div className="flex gap-2">
               <Button
